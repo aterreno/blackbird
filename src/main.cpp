@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
     std::cout << "DISCLAIMER: USE THE SOFTWARE AT YOUR OWN RISK\n" << std::endl;
     std::locale mylocale("");
     // load the parameters
-    Parameters params("blackbird.conf");
+    Parameters params("/Users/antonioterreno/code/try/blackbird/blackbird.conf");
     if (!params.demoMode) {
         if (!params.useFullCash) {
             if (!params.cashForTesting < 10.0) {
@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
             }
         }
     }
-    if (!params.useDatabase) {
+    if (params.useDatabase) {
         if (createDbConnection(params) != 0) {
             std::cout << "ERROR: cannot connect to the database \'" << params.dbName << "\'\n" << std::endl;
             return -1;
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = Bitfinex::isOrderComplete;
         getActivePos[index] = Bitfinex::getActivePos;
         getLimitPrice[index] = Bitfinex::getLimitPrice;
-        if (!params.useDatabase) {
+        if (params.useDatabase) {
             dbTableName[index] = "bitfinex";
             createTable(dbTableName[index], params);
         }
@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = OKCoin::isOrderComplete;
         getActivePos[index] = OKCoin::getActivePos;
         getLimitPrice[index] = OKCoin::getLimitPrice;
-        if (!params.useDatabase) {
+        if (params.useDatabase) {
             dbTableName[index] = "okcoin";
             createTable(dbTableName[index], params);
         }
@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = Bitstamp::isOrderComplete;
         getActivePos[index] = Bitstamp::getActivePos;
         getLimitPrice[index] = Bitstamp::getLimitPrice;
-        if (!params.useDatabase) {
+        if (params.useDatabase) {
             dbTableName[index] = "bitstamp";
             createTable(dbTableName[index], params);
         }
@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = Gemini::isOrderComplete;
         getActivePos[index] = Gemini::getActivePos;
         getLimitPrice[index] = Gemini::getLimitPrice;
-        if (!params.useDatabase) {
+        if (params.useDatabase) {
             dbTableName[index] = "gemini";
             createTable(dbTableName[index], params);
         }
@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = Kraken::isOrderComplete;
         getActivePos[index] = Kraken::getActivePos;
         getLimitPrice[index] = Kraken::getLimitPrice;
-        if (!params.useDatabase) {
+        if (params.useDatabase) {
             dbTableName[index] = "kraken";
             createTable(dbTableName[index], params);
         }
@@ -155,7 +155,7 @@ int main(int argc, char **argv) {
         getAvail[index] = ItBit::getAvail;
         getActivePos[index] = ItBit::getActivePos;
         getLimitPrice[index] = ItBit::getLimitPrice;
-        if (!params.useDatabase) {
+        if (params.useDatabase) {
             dbTableName[index] = "itbit";
             createTable(dbTableName[index], params);
         }
@@ -167,7 +167,7 @@ int main(int argc, char **argv) {
         getAvail[index] = BTCe::getAvail;
         getActivePos[index] = BTCe::getActivePos;
         getLimitPrice[index] = BTCe::getLimitPrice;
-        if (!params.useDatabase) {
+        if (params.useDatabase) {
             dbTableName[index] = "btce";
             createTable(dbTableName[index], params);
         }
@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = Poloniex::isOrderComplete;
         getActivePos[index] = Poloniex::getActivePos;
         getLimitPrice[index] = Poloniex::getLimitPrice;
-        if (!params.useDatabase) {
+        if (params.useDatabase) {
             dbTableName[index] = "poloniex";
             createTable(dbTableName[index], params);
         }
@@ -214,7 +214,7 @@ int main(int argc, char **argv) {
     logFile << "|   Blackbird Bitcoin Arbitrage Log File   |" << std::endl;
     logFile << "--------------------------------------------\n" << std::endl;
     logFile << "Blackbird started on " << printDateTime() << "\n" << std::endl;
-    if (!params.useDatabase) {
+    if (params.useDatabase) {
         logFile << "Connected to database \'" << params.dbName << "\'\n" << std::endl;
     }
     if (!params.demoMode) {
@@ -330,7 +330,7 @@ int main(int argc, char **argv) {
         for (int i = 0; i < numExch; ++i) {
             double bid = getQuote[i](params, true);
             double ask = getQuote[i](params, false);
-            if (!params.useDatabase) {
+            if (params.useDatabase) {
                 addBidAskToDb(dbTableName[i], printDateTimeDb(currTime), bid, ask, params);
             }
             if (bid == 0.0) {
@@ -598,7 +598,7 @@ int main(int argc, char **argv) {
     // analysis loop exited, do some cleanup
     curl_easy_cleanup(params.curl);
     curl_global_cleanup();
-    if (!params.useDatabase) {
+    if (params.useDatabase) {
         mysql_close(params.dbConn);
     }
     csvFile.close();

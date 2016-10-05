@@ -6,11 +6,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 find_package(MySQL REQUIRED)
 include_directories(${MySQL_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${MySQL_LIBRARIES})
+set(LIBS ${LIBS} ${MYSQL_CLIENT_LIBS})
 
 find_package(JANSSON REQUIRED)
 include_directories(${JANSSON_INCLUDE_PATHS})
 set(LIBS ${LIBS} ${JANSSON_LIBRARIES})
+
+find_package(CURL REQUIRED)
+include_directories(${CURL_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${CURL_LIBRARIES})
 
 set(OPENSSL_ROOT_DIR /usr/local/Cellar/openssl/1.0.2h_1)
 find_package(OPENSSL REQUIRED)
@@ -56,3 +60,8 @@ src/time_fun.cpp
 src/time_fun.h)
 
 add_executable(blackbird ${SOURCE_FILES})
+target_link_libraries(blackbird ${LIBS})
+#target_link_libraries(blackbird ${MySQL_LIBRARIES})
+#target_link_libraries(blackbird ${JANSSON_LIBRARIES})
+#target_link_libraries(blackbird ${OPENSSL_CRYPTO_LIBRARY})
+#target_link_libraries(blackbird ${CURL_LIBRARIES})
