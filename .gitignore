@@ -1,4 +1,6 @@
-*.config
+blackbird.conf
+CMakeFiles/
+CMakeCache.txt
 .idea
 *.log
 *.csv
