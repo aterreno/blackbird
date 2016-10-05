@@ -13,6 +13,7 @@
 #include <jansson.h>
 #include "bitstamp.h"
 #include "curl_fun.h"
+#include "../parameters.h"
 
 namespace Bitstamp {
 

@@ -9,6 +9,7 @@
 #include <jansson.h>
 #include "okcoin.h"
 #include "curl_fun.h"
+#include "../parameters.h"
 
 namespace OKCoin {
 
