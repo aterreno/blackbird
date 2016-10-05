@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
     std::cout << "DISCLAIMER: USE THE SOFTWARE AT YOUR OWN RISK\n" << std::endl;
     std::locale mylocale("");
     // load the parameters
-    Parameters params("/Users/antonioterreno/code/try/blackbird/blackbird.conf");
+    Parameters params("blackbird.conf"); //TODO need to hack this when running on debug
     if (!params.demoMode) {
         if (!params.useFullCash) {
             if (!params.cashForTesting < 10.0) {
