@@ -3,7 +3,7 @@
 
 #include <curl/curl.h>
 #include <string>
-#include "parameters.h"
+#include "../parameters.h"
 
 namespace BTCe {
 

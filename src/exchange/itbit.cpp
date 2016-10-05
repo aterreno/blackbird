@@ -1,11 +1,8 @@
 #include <string.h>
 #include <iostream>
 #include <sstream>
-#include <unistd.h>
 #include <jansson.h>
 #include "itbit.h"
-#include "curl_fun.h"
-#include "../parameters.h"
 #include "../curl_fun.h"
 
 namespace ItBit {

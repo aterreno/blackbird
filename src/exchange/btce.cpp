@@ -3,8 +3,6 @@
 #include <sstream>
 #include <jansson.h>
 #include "btce.h"
-#include "curl_fun.h"
-#include "../parameters.h"
 #include "../curl_fun.h"
 
 namespace BTCe {

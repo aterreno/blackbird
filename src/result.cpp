@@ -1,6 +1,5 @@
 #include "result.h"
 #include "time_fun.h"
-#include <type_traits>
 
 
 double Result::targetPerfLong() {

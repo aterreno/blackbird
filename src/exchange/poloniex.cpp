@@ -6,11 +6,8 @@
 #include <sys/time.h>
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
-#include "utils/base64.h"
 #include <jansson.h>
 #include "poloniex.h"
-#include "curl_fun.h"
-#include "../parameters.h"
 #include "../curl_fun.h"
 
 namespace Poloniex {

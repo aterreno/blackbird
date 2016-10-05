@@ -1,9 +1,7 @@
 
-#include "time_fun.h"
+#include "../time_fun.h"
 #include "../result.h"
 #include "../parameters.h"
-#include "../time_fun.h"
-#include <stdlib.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>

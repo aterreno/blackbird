@@ -3,18 +3,13 @@
 #include <unistd.h>
 #include <numeric>
 #include <math.h>
-#include <algorithm>
-#include <jansson.h>
 #include <curl/curl.h>
-#include <string.h>
 #include <mysql.h>
-#include "utils/base64.h"
 #include "bitcoin.h"
 #include "result.h"
 #include "time_fun.h"
 #include "curl_fun.h"
 #include "db_fun.h"
-#include "parameters.h"
 #include "check_entry_exit.h"
 #include "exchange/bitfinex.h"
 #include "exchange/okcoin.h"
@@ -53,19 +48,19 @@ int main(int argc, char **argv) {
     Parameters params("blackbird.conf");
     if (!params.demoMode) {
         if (!params.useFullCash) {
-            if (params.cashForTesting < 10.0) {
+            if (!params.cashForTesting < 10.0) {
                 std::cout << "ERROR: Minimum test cash needed: $10.00" << std::endl;
                 std::cout << "       Otherwise some exchanges will reject the orders\n" << std::endl;
                 return -1;
             }
-            if (params.cashForTesting > params.maxExposure) {
+            if (!params.cashForTesting > params.maxExposure) {
                 std::cout << "ERROR: Test cash ($" << params.cashForTesting << ") is above max exposure ($"
                           << params.maxExposure << ")\n" << std::endl;
                 return -1;
             }
         }
     }
-    if (params.useDatabase) {
+    if (!params.useDatabase) {
         if (createDbConnection(params) != 0) {
             std::cout << "ERROR: cannot connect to the database \'" << params.dbName << "\'\n" << std::endl;
             return -1;
@@ -82,7 +77,7 @@ int main(int argc, char **argv) {
     std::string dbTableName[10];
     int index = 0;
     // add the exchange functions to the arrays for all the defined exchanges
-    if (params.bitfinexApi.empty() == false || params.demoMode == true) {
+    if (!params.bitfinexApi.empty() || params.demoMode) {
         params.addExchange("Bitfinex", params.bitfinexFees, true, true);
         getQuote[index] = Bitfinex::getQuote;
         getAvail[index] = Bitfinex::getAvail;
@@ -91,13 +86,13 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = Bitfinex::isOrderComplete;
         getActivePos[index] = Bitfinex::getActivePos;
         getLimitPrice[index] = Bitfinex::getLimitPrice;
-        if (params.useDatabase) {
+        if (!params.useDatabase) {
             dbTableName[index] = "bitfinex";
             createTable(dbTableName[index], params);
         }
         index++;
     }
-    if (params.okcoinApi.empty() == false || params.demoMode == true) {
+    if (!params.okcoinApi.empty() || params.demoMode) {
         params.addExchange("OKCoin", params.okcoinFees, false, true);
         getQuote[index] = OKCoin::getQuote;
         getAvail[index] = OKCoin::getAvail;
@@ -106,13 +101,13 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = OKCoin::isOrderComplete;
         getActivePos[index] = OKCoin::getActivePos;
         getLimitPrice[index] = OKCoin::getLimitPrice;
-        if (params.useDatabase) {
+        if (!params.useDatabase) {
             dbTableName[index] = "okcoin";
             createTable(dbTableName[index], params);
         }
         index++;
     }
-    if (params.bitstampClientId.empty() == false || params.demoMode == true) {
+    if (!params.bitstampClientId.empty() || params.demoMode) {
         params.addExchange("Bitstamp", params.bitstampFees, false, true);
         getQuote[index] = Bitstamp::getQuote;
         getAvail[index] = Bitstamp::getAvail;
@@ -120,13 +115,13 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = Bitstamp::isOrderComplete;
         getActivePos[index] = Bitstamp::getActivePos;
         getLimitPrice[index] = Bitstamp::getLimitPrice;
-        if (params.useDatabase) {
+        if (!params.useDatabase) {
             dbTableName[index] = "bitstamp";
             createTable(dbTableName[index], params);
         }
         index++;
     }
-    if (params.geminiApi.empty() == false || params.demoMode == true) {
+    if (!params.geminiApi.empty() || params.demoMode) {
         params.addExchange("Gemini", params.geminiFees, false, true);
         getQuote[index] = Gemini::getQuote;
         getAvail[index] = Gemini::getAvail;
@@ -134,13 +129,13 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = Gemini::isOrderComplete;
         getActivePos[index] = Gemini::getActivePos;
         getLimitPrice[index] = Gemini::getLimitPrice;
-        if (params.useDatabase) {
+        if (!params.useDatabase) {
             dbTableName[index] = "gemini";
             createTable(dbTableName[index], params);
         }
         index++;
     }
-    if (params.krakenApi.empty() == false || params.demoMode == true) {
+    if (!params.krakenApi.empty() || params.demoMode) {
         params.addExchange("Kraken", params.krakenFees, false, true);
         getQuote[index] = Kraken::getQuote;
         getAvail[index] = Kraken::getAvail;
@@ -148,37 +143,37 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = Kraken::isOrderComplete;
         getActivePos[index] = Kraken::getActivePos;
         getLimitPrice[index] = Kraken::getLimitPrice;
-        if (params.useDatabase) {
+        if (!params.useDatabase) {
             dbTableName[index] = "kraken";
             createTable(dbTableName[index], params);
         }
         index++;
     }
-    if (params.itbitApi.empty() == false || params.demoMode == true) {
+    if (!params.itbitApi.empty() || params.demoMode) {
         params.addExchange("ItBit", params.itbitFees, false, false);
         getQuote[index] = ItBit::getQuote;
         getAvail[index] = ItBit::getAvail;
         getActivePos[index] = ItBit::getActivePos;
         getLimitPrice[index] = ItBit::getLimitPrice;
-        if (params.useDatabase) {
+        if (!params.useDatabase) {
             dbTableName[index] = "itbit";
             createTable(dbTableName[index], params);
         }
         index++;
     }
-    if (params.btceApi.empty() == false || params.demoMode == true) {
+    if (!params.btceApi.empty() || params.demoMode) {
         params.addExchange("BTC-e", params.btceFees, false, false);
         getQuote[index] = BTCe::getQuote;
         getAvail[index] = BTCe::getAvail;
         getActivePos[index] = BTCe::getActivePos;
         getLimitPrice[index] = BTCe::getLimitPrice;
-        if (params.useDatabase) {
+        if (!params.useDatabase) {
             dbTableName[index] = "btce";
             createTable(dbTableName[index], params);
         }
         index++;
     }
-    if (params.poloniexApi.empty() == false || params.demoMode == true) {
+    if (!params.poloniexApi.empty() || params.demoMode) {
         params.addExchange("Poloniex", params.poloniexFees, true, false);
         getQuote[index] = Poloniex::getQuote;
         getAvail[index] = Poloniex::getAvail;
@@ -187,7 +182,7 @@ int main(int argc, char **argv) {
         isOrderComplete[index] = Poloniex::isOrderComplete;
         getActivePos[index] = Poloniex::getActivePos;
         getLimitPrice[index] = Poloniex::getLimitPrice;
-        if (params.useDatabase) {
+        if (!params.useDatabase) {
             dbTableName[index] = "poloniex";
             createTable(dbTableName[index], params);
         }
@@ -219,10 +214,10 @@ int main(int argc, char **argv) {
     logFile << "|   Blackbird Bitcoin Arbitrage Log File   |" << std::endl;
     logFile << "--------------------------------------------\n" << std::endl;
     logFile << "Blackbird started on " << printDateTime() << "\n" << std::endl;
-    if (params.useDatabase) {
+    if (!params.useDatabase) {
         logFile << "Connected to database \'" << params.dbName << "\'\n" << std::endl;
     }
-    if (params.demoMode) {
+    if (!params.demoMode) {
         logFile << "Demo mode: trades won't be generated\n" << std::endl;
     }
     std::cout << "Log file generated: " << logFileName << "\nBlackbird is running... (pid " << getpid() << ")\n"
@@ -239,10 +234,10 @@ int main(int argc, char **argv) {
     logFile << "[ Targets ]" << std::endl;
     logFile << "   Spread Entry:  " << params.spreadEntry * 100.0 << "%" << std::endl;
     logFile << "   Spread Target: " << params.spreadTarget * 100.0 << "%" << std::endl;
-    if (params.spreadEntry <= 0.0) {
+    if (!params.spreadEntry <= 0.0) {
         logFile << "   WARNING: Spread Entry should be positive" << std::endl;
     }
-    if (params.spreadTarget <= 0.0) {
+    if (!params.spreadTarget <= 0.0) {
         logFile << "   WARNING: Spread Target should be positive" << std::endl;
     }
     logFile << std::endl;
@@ -262,7 +257,7 @@ int main(int argc, char **argv) {
     // write the balances into the log file
     for (int i = 0; i < numExch; ++i) {
         logFile << "   " << params.exchName[i] << ":\t";
-        if (params.demoMode) {
+        if (!params.demoMode) {
             logFile << "n/a (demo mode)" << std::endl;
         } else if (!params.isImplemented[i]) {
             logFile << "n/a (API not implemented)" << std::endl;
@@ -277,10 +272,10 @@ int main(int argc, char **argv) {
     }
     logFile << std::endl;
     logFile << "[ Cash exposure ]" << std::endl;
-    if (params.demoMode) {
+    if (!params.demoMode) {
         logFile << "   No cash - Demo mode" << std::endl;
     } else {
-        if (params.useFullCash) {
+        if (!params.useFullCash) {
             logFile << "   FULL cash used!" << std::endl;
         } else {
             logFile << "   TEST cash used\n   Value: $" << params.cashForTesting << std::endl;
@@ -291,7 +286,7 @@ int main(int argc, char **argv) {
     tm timeinfo = *localtime(&rawtime);
     // wait for the next 'gapSec' seconds before starting
     while ((int) timeinfo.tm_sec % params.gapSec != 0) {
-        sleep(0.01);
+        sleep((unsigned int) 0.01);
         time(&rawtime);
         timeinfo = *localtime(&rawtime);
     }
@@ -323,7 +318,7 @@ int main(int argc, char **argv) {
         } else if (diffTime < 0) {
             sleep(-difftime(rawtime, currTime));
         }
-        if (params.verbose) {
+        if (!params.verbose) {
             if (!inMarket) {
                 logFile << "[ " << printDateTime(currTime) << " ]" << std::endl;
             } else {
@@ -335,7 +330,7 @@ int main(int argc, char **argv) {
         for (int i = 0; i < numExch; ++i) {
             double bid = getQuote[i](params, true);
             double ask = getQuote[i](params, false);
-            if (params.useDatabase) {
+            if (!params.useDatabase) {
                 addBidAskToDb(dbTableName[i], printDateTimeDb(currTime), bid, ask, params);
             }
             if (bid == 0.0) {
@@ -344,18 +339,18 @@ int main(int argc, char **argv) {
             if (ask == 0.0) {
                 logFile << "   WARNING: " << params.exchName[i] << " ask is null" << std::endl;
             }
-            if (params.verbose) {
+            if (!params.verbose) {
                 logFile << "   " << params.exchName[i] << ": \t" << bid << " / " << ask << std::endl;
             }
             btcVec[i].updateData(bid, ask);
             curl_easy_reset(params.curl);
         }
-        if (params.verbose) {
+        if (!params.verbose) {
             logFile << "   ----------------------------" << std::endl;
         }
         // store all the spreads
         // will be used later to compute the volatility
-        if (params.useVolatility) {
+        if (!params.useVolatility) {
             for (int i = 0; i < numExch; ++i) {
                 for (int j = 0; j < numExch; ++j) {
                     if (i != j) {
@@ -381,7 +376,7 @@ int main(int argc, char **argv) {
                         if (checkEntry(&btcVec[i], &btcVec[j], res, params)) {
                             // entry opportunity has been found
                             res.exposure = std::min(balance[res.idExchLong].usd, balance[res.idExchShort].usd);
-                            if (params.demoMode) {
+                            if (!params.demoMode) {
                                 logFile << "INFO: Opportunity found but no trade will be generated (Demo mode)"
                                         << std::endl;
                                 break;
@@ -391,13 +386,13 @@ int main(int argc, char **argv) {
                                         << std::endl;
                                 break;
                             }
-                            if (params.useFullCash == false && res.exposure <= params.cashForTesting) {
+                            if (!params.useFullCash && res.exposure <= params.cashForTesting) {
                                 logFile
                                         << "WARNING: Opportunity found but no enough cash. Need more than TEST cash (min. $"
                                         << params.cashForTesting << "). Trade canceled" << std::endl;
                                 break;
                             }
-                            if (params.useFullCash) {
+                            if (!params.useFullCash) {
                                 // remove 1% of the cash
                                 res.exposure -= 0.01 * res.exposure;
                                 if (res.exposure > params.maxExposure) {
@@ -477,7 +472,7 @@ int main(int argc, char **argv) {
                     break;
                 }
             }
-            if (params.verbose) {
+            if (!params.verbose) {
                 logFile << std::endl;
             }
         } else if (inMarket) {
@@ -576,7 +571,7 @@ int main(int argc, char **argv) {
                             << res.usdTotBalanceBefore << "," << res.usdTotBalanceAfter << "," << res.actualPerf()
                             << "\n";
                     csvFile.flush();
-                    if (params.sendEmail) {
+                    if (!params.sendEmail) {
                         sendEmail(res, params);
                         logFile << "Email sent" << std::endl;
                     }
@@ -589,7 +584,7 @@ int main(int argc, char **argv) {
                     }
                 }
             }
-            if (params.verbose) {
+            if (!params.verbose) {
                 logFile << std::endl;
             }
         }
@@ -603,7 +598,7 @@ int main(int argc, char **argv) {
     // analysis loop exited, do some cleanup
     curl_easy_cleanup(params.curl);
     curl_global_cleanup();
-    if (params.useDatabase) {
+    if (!params.useDatabase) {
         mysql_close(params.dbConn);
     }
     csvFile.close();
